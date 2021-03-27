@@ -1,4 +1,5 @@
 use libc::{PRIO_PROCESS,PRIO_PGRP,PRIO_USER};
+use std::convert::TryInto;
 
 ///! Set and get program scheduling priority
 /// Which identifier type to use (`pid`, `gid`, or `uid`)
@@ -25,7 +26,7 @@ pub fn set_priority(which: Which, who: i32, priority: i32) -> Result<(), ()> {
         Which::Group => PRIO_PGRP,
         Which::User => PRIO_USER,
     };
-    platform::set_priority(c_which, who, priority)
+    platform::set_priority(c_which.try_into().unwrap(), who, priority)
 }
 
 /// Get the scheduling priority for the `Which` of the calling process
@@ -40,7 +41,7 @@ pub fn get_priority(which: Which, who: i32) -> Result<i32, ()> {
         Which::Group => PRIO_PGRP,
         Which::User => PRIO_USER,
     };
-    platform::get_priority(c_which, who)
+    platform::get_priority(c_which.try_into().unwrap(), who)
 }
 
 mod platform {
